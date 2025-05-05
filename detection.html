@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Detection | Tea Leaf Disease</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to right, #a2c7ec, #ffe3e8);
+            padding-top: 90px;
+        }
+
+        .navbar {
+            background: black !important;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.4rem;
+            color: #f8f9fa !important;
+        }
+
+        .nav-link {
+            color: white !important;
+            font-weight: bold;
+        }
+
+        .nav-link:hover {
+            color: #ffc107 !important;
+        }
+
+        .upload-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .upload-section input[type="file"] {
+            max-width: 400px;
+            margin: auto;
+        }
+
+        .upload-section button {
+            margin-top: 15px;
+            padding: 10px 30px;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+
+        .result-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .image-preview {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 250px;
+            border-radius: 10px;
+            border: 3px solid #dee2e6;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-box {
+            flex: 1;
+            max-width: 400px;
+            background: #28a745;
+            color: white;
+            padding: 20px 25px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .result-box h4 {
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .result-box p {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #007bff, #0056b3);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(to right, #0056b3, #004494);
+        }
+    </style>
+</head>
+
+<body style="
+  background-image: url('/static/images/home.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 100vh;
+  margin: 0;
+">
+
+
+
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="{{ url_for('home') }}">Tea Leaf Disease Detection</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('contact') }}">Contact</a>
+                    </li>
+                    {% if session.get('email') %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa fa-user-circle me-1"></i> Profile
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('profile') }}">View Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="container">
+        <div class="upload-section">
+            <h2 class="section-title">Tea Leaf Disease Detection</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <input class="form-control" type="file" name="image" accept="image/*" required>
+                <button class="btn btn-primary mt-3" type="submit">Predict</button>
+            </form>
+        </div>
+
+        {% if image_path %}
+        <div class="result-wrapper">
+            <div class="image-preview">
+                <h5 class="text-center mb-3 fw-bold">Uploaded Image</h5>
+                <img src="{{ url_for('static', filename=image_path) }}" alt="Uploaded Image">
+            </div>
+
+            <div class="result-box mt-5">
+                <h4 class="text-center">Prediction Result</h4>
+                <hr>
+                <p class="fw-bold"><strong class="text-dark">Disease:</strong> {{ prediction }}</p>
+                <p class="fw-bold"><strong class="text-dark">Confidence:</strong> {{ '%.2f'|format(confidence * 100) }}%
+                </p>
+            <div class="d-flex justify-content-center mt-4">
+                <a href="/tips/{{ formatted_prediction }}" class="btn btn-primary btn-lg px-4">Tips</a>
+            </div>
+
+
+
+
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

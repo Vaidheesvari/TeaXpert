@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Tea Leaf Image</title>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap");
+
+      body {
+        font-family: "Inter", sans-serif;
+        text-align: center;
+        background: url("leaf-background-2.jpg") no-repeat center center fixed;
+        background-size: cover;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.8);
+        padding: 25px;
+        border-radius: 12px;
+        width: 350px;
+        text-align: center;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      h1 {
+        color: #2c3e50;
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-size: 14px;
+        color: #34495e;
+        margin-bottom: 15px;
+      }
+
+      input {
+        padding: 10px;
+        width: calc(100% - 20px);
+        border: 2px solid #3498db;
+        border-radius: 8px;
+        margin-top: 10px;
+        outline: none;
+        font-size: 14px;
+        text-align: center;
+      }
+
+      button {
+        padding: 12px 20px;
+        margin-top: 10px;
+        border-radius: 8px;
+        border: none;
+        background: #3498db;
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+        transition: 0.3s;
+        width: 100%;
+        font-weight: 600;
+      }
+
+      button:hover {
+        background: #2980b9;
+        transform: scale(1.05);
+      }
+
+      #preview {
+        display: none;
+        width: 250px;
+        height: auto;
+        margin-top: 15px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        border: 2px solid #3498db;
+        padding: 5px;
+      }
+
+      #error-msg {
+        color: red;
+        font-size: 14px;
+        margin-top: 10px;
+        display: none;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Upload <span style="color: #2980b9">Tea Leaf Image</span></h1>
+      <p>Select an image to detect diseases.</p>
+      <input
+        type="file"
+        id="imageUpload"
+        accept="image/*"
+        onchange="previewImage(event)"
+      />
+      <img id="preview" src="" alt="Image Preview" />
+      <p id="error-msg"></p>
+      <!-- Error message area -->
+      <button onclick="uploadImage()">Detect Disease</button>
+    </div>
+
+    <script>
+      function previewImage(event) {
+        var preview = document.getElementById("preview");
+        var errorMsg = document.getElementById("error-msg");
+        var file = event.target.files[0];
+
+        if (file) {
+          var reader = new FileReader();
+          reader.onload = function () {
+            preview.src = reader.result;
+            preview.style.display = "block";
+            errorMsg.style.display = "none"; // Hide error message on valid input
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      function isLeafImage(file) {
+        // Basic filename validation (use AI model for advanced detection)
+        const allowedLeafKeywords = ["leaf", "tea", "plant"];
+        let fileName = file.name.toLowerCase();
+
+        return allowedLeafKeywords.some((keyword) =>
+          fileName.includes(keyword)
+        );
+      }
+
+      function uploadImage() {
+        var fileInput = document.getElementById("imageUpload");
+        var errorMsg = document.getElementById("error-msg");
+
+        if (fileInput.files.length === 0) {
+          errorMsg.innerText = "⚠ Please select an image first.";
+          errorMsg.style.display = "block";
+          return;
+        }
+
+        var file = fileInput.files[0];
+
+        if (!isLeafImage(file)) {
+          errorMsg.innerText = "⚠ Error: Please upload a valid tea leaf image.";
+          errorMsg.style.display = "block";
+          return;
+        }
+
+        var formData = new FormData();
+        formData.append("image", file);
+
+        fetch("http://127.0.0.1:5000/upload", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error) {
+              errorMsg.innerText = "⚠ " + data.error;
+              errorMsg.style.display = "block";
+            } else {
+              console.log(data);
+
+              localStorage.setItem("disease", data.disease);
+              localStorage.setItem("percentage", data.percentage);
+              window.location.href = "result.html";
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            errorMsg.innerText = "⚠ Error detecting disease.";
+            errorMsg.style.display = "block";
+          });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Result - TeaXpert</title>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        text-align: center;
+        background: url("leaf-background-2.jpg") no-repeat center center fixed;
+        background-size: cover;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .container {
+        background: rgba(255, 255, 255, 0.8);
+        padding: 25px;
+        border-radius: 12px;
+        width: 350px;
+        text-align: center;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      }
+      h1 {
+        color: #2c3e50;
+        font-size: 28px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      p {
+        font-size: 14px;
+        color: #34495e;
+        margin-bottom: 15px;
+      }
+      .button-container {
+        margin-top: 20px;
+      }
+      button {
+        padding: 12px 20px;
+        margin-top: 10px;
+        border-radius: 8px;
+        border: none;
+        background: #3498db;
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+        transition: 0.3s;
+        width: 100%;
+        font-weight: 600;
+      }
+      button:hover {
+        background: #2980b9;
+        transform: scale(1.05);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Detected Disease</h1>
+      <p id="disease-name"></p>
+      <p id="disease-percentage"></p>
+      <div class="button-container">
+        <button onclick="seeTips()">See Tips</button>
+        <button onclick="uploadAnother()">Upload Another Image</button>
+      </div>
+    </div>
+
+    <script>
+      // Example: Get data from model result
+      const disease = "Blight";  // Replace this with your model's result
+      const percentage = "85";   // Replace with actual percentage from model
+
+      // Save to localStorage
+      localStorage.setItem("disease", disease);
+      localStorage.setItem("percentage", percentage);
+
+      // Display data
+      document.getElementById("disease-name").innerText = "Disease: " + disease;
+      document.getElementById("disease-percentage").innerText = "Affected Area: " + percentage + "%";
+
+      function seeTips() {
+        window.location.href = "tips.html";
+      }
+
+      function uploadAnother() {
+        window.location.href = "upload.html";
+      }
+    </script>
+  </body>
+</html>
